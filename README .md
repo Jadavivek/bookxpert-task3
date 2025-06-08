@@ -98,14 +98,7 @@ The UI will be live at: [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🚀 Future Enhancements
 
-- Add support for more languages
-- Save chat history
-- Add authentication (optional)
-- Deploy to Vercel / Render / EC2
-
----
 
 ## 📜 License
 
