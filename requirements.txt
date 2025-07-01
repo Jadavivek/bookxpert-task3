@@ -1,0 +1,42 @@
+from pydub import AudioSegment
+import requests
+
+# 1. Split audio into chunks (e.g., 30s)
+def split_audio(file_path, chunk_length_ms=30000):
+    audio = AudioSegment.from_file(file_path)
+    chunks = []
+    for i in range(0, len(audio), chunk_length_ms):
+        chunk = audio[i:i + chunk_length_ms]
+        chunk_path = f"chunk_{i // chunk_length_ms}.wav"
+        chunk.export(chunk_path, format="wav")
+        chunks.append(chunk_path)
+    return chunks
+
+# 2. Send audio chunk to API
+def transcribe_chunk(file_path):
+    url = "<YOUR_SARVAM_API_URL>"  # Replace with actual endpoint
+    headers = {
+        # Optional: "Authorization": "Bearer <YOUR_API_KEY>"
+    }
+    files = {'file': open(file_path, 'rb')}
+    response = requests.post(url, headers=headers, files=files)
+    response.raise_for_status()
+    return response.json().get("text", "")
+
+# 3. Combine and print full transcription
+def transcribe_full_audio(audio_path):
+    chunks = split_audio(audio_path)
+    full_transcript = ""
+    for chunk in chunks:
+        print(f"Transcribing: {chunk}")
+        text = transcribe_chunk(chunk)
+        full_transcript += text + " "
+    return full_transcript
+
+# 4. Entry point
+if __name__ == "__main__":
+    path = "long_audio.wav"
+    final_text = transcribe_full_audio(path)
+    with open("transcription.txt", "w") as f:
+        f.write(final_text)
+    print("✅ Transcription saved to 'transcription.txt'")
